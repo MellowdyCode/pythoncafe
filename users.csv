@@ -1,0 +1,6 @@
+id,username,password,role
+P1,pembeli,pembeli,pembeli
+P2,kasir,kasir,kasir
+P3,waiter,waiter,waiter
+P4,admin,admin,admin
+P5,pemilik,pemilik,pemilik
