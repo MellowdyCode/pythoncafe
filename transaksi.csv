@@ -1,2 +1,3 @@
 id,tanggal,total,metode_pembayaran,meja_id,status
-TRX-20251202003616,2025-12-02 00:36:16,31500,Cash,Meja 2,Selesai
+TRX-20251202121502,2025-12-02 12:15:02,40000,Cash,Meja 1,Lunas
+TRX-20251202121658,2025-12-02 12:16:58,30000,Cash,Meja 1,Lunas

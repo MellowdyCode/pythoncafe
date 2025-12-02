@@ -1,3 +1,4 @@
-id,nama,kategori,harga,stok,foto
-1,Es Kopi Gula Aren,minuman,15000,0,assets/Es Kopi Gula Aren.jpg
-2,Roti Bakar Cokelat,makanan,10000,6,assets/Roti Bakar Cokelat.jpg
+id,nama,harga,stok,foto
+2,Roti Bakar Cokelat,10000,8,assets/Roti Bakar Cokelat.jpg
+3,The Hangat,8000,10,assets/Teh Hangat.jpg
+4,Es Kopi Gula Aren,15000,15,C:/Test Codes/Test Python/Cafe Demo/assets/Es Kopi Gula Aren.jpg
