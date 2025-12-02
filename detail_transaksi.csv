@@ -1,1 +1,5 @@
 id,transaksi_id,menu_id,jumlah,subtotal,diskon
+TRX-20251202000602,1,Es Kopi Gula Aren,3,15000,10
+TRX-20251202000602,2,Roti Bakar Cokelat,2,10000,10
+TRX-20251202003616,1,Es Kopi Gula Aren,1,15000,10
+TRX-20251202003616,2,Roti Bakar Cokelat,2,10000,10

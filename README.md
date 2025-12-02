@@ -1,2 +1,0 @@
-# pythoncafe
-python cafe project
