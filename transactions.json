@@ -1,0 +1,27 @@
+[
+  {
+    "order_id": "ORD20251205124155",
+    "customer": "mett",
+    "table": "123",
+    "items": [
+      {
+        "nama": "Everything Bagel Bakery",
+        "harga": "22000",
+        "harga_normal": "22000"
+      },
+      {
+        "nama": "Crosaint",
+        "harga": "18000",
+        "harga_normal": "18000"
+      },
+      {
+        "nama": "Burger",
+        "harga": "35000",
+        "harga_normal": "35000"
+      }
+    ],
+    "total": 75000,
+    "status": "paid",
+    "timestamp": "2025-12-05 12:41:55"
+  }
+]

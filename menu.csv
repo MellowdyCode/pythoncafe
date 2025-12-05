@@ -1,3 +1,12 @@
-id,nama,kategori,harga,stok,foto
-1,Es Kopi Gula Aren,minuman,15000,8,assets/Es Kopi Gula Aren.jpg
-2,Roti Bakar Cokelat,makanan,10000,6,assets/Roti Bakar Cokelat.jpg
+id,nama,kategori,harga,stok,foto,promo
+1,Es Kopi Gula Aren,Minuman,15000,9,assets/Es Kopi Gula Aren.jpg,0
+2,Roti Bakar Cokelat,Makanan,10000,10,assets/Roti Bakar Cokelat.jpg,0
+3,Blueberry Muffin Cake,Makanan,25000,9,assets/Blueberry Muffin cake.jpg,0
+4,Burger,Makanan,35000,4,assets/Burger.jpg,0
+5,Cheese Danish Bakery,Makanan,20000,4,assets/Cheese Danish Bakery.jpg,0
+6,Classic Macaroni Schotel,Makanan,30000,10,assets/Classic Macaroni sSchotel.jpg,0
+7,Crosaint,Makanan,18000,8,assets/Crosaint.jpeg,0
+8,Everything Bagel Bakery,Makanan,22000,8,assets/Everything Bagel bakery.jpeg,0
+9,Scarlet Velvet Cake,Makanan,35000,9,assets/Scarlet Velvet Cake.jpg,0
+10,Teh Hangat,Minuman,8000,10,assets/Teh Hangat.jpg,0
+11,Vanilla Latte,Minuman,20000,10,assets/Vanila Latte.jpg,10
