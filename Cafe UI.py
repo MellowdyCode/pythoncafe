@@ -9,8 +9,8 @@ import datetime
 from functools import partial
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
-
-
+from tkinter import font as tkfont
+import qrcode
 login_window = Tk()
 login_window.title("Python Cafe - Login")
 login_window.geometry("800x600")
@@ -19,6 +19,52 @@ login_window.configure(bg="#F2DFD7")
 # ======================================================
 # LOGIN
 # ======================================================
+
+def apply_theme(root):
+    style = ttk.Style(root)
+    style.theme_use("clam")
+
+    PRIMARY = "#6F4E37"     # coffee brown
+    SECONDARY = "#E8DCC8"
+    BG = "#F2DFD7"
+    CARD = "#FFFFFF"
+    ACCENT = "#4CAF50"
+    DANGER = "#C0392B"
+
+    root.configure(bg=BG)
+
+    style.configure("TButton",
+        font=("Arial", 11),
+        padding=8,
+        background=PRIMARY,
+        foreground="white"
+    )
+
+    style.map("TButton",
+        background=[("active", "#5A3E2B")]
+    )
+
+    style.configure("Card.TFrame",
+        background=CARD,
+        relief="ridge",
+        borderwidth=2
+    )
+
+    style.configure("Title.TLabel",
+        font=("Arial", 18, "bold"),
+        background=BG
+    )
+
+    style.configure("Header.TLabel",
+        font=("Arial", 14, "bold"),
+        background=CARD
+    )
+
+    style.configure("Muted.TLabel",
+        font=("Arial", 10),
+        foreground="#555",
+        background=CARD
+    )
 
 def login(username_input, password_input):
     with open("users.csv", newline='', encoding="utf-8") as file:
@@ -238,14 +284,32 @@ def total_pendapatan_hari_ini():
             pass
     return total
 
+def create_scrollable_frame(parent, bg):
+    canvas = Canvas(parent, bg=bg, highlightthickness=0)
+    scrollbar = ttk.Scrollbar(parent, orient="vertical", command=canvas.yview)
 
-# ======================================================
-# ORDER PAGE
-# ======================================================
+    scroll_frame = Frame(canvas, bg=bg)
 
-# ======================================================
-# ORDER PAGE (UPDATED: remove item, qty adjust, discount display)
-# ======================================================
+    window_id = canvas.create_window((0, 0), window=scroll_frame, anchor="nw")
+
+    def on_configure(event):
+        canvas.configure(scrollregion=canvas.bbox("all"))
+        canvas.itemconfig(window_id, width=event.width)
+
+    canvas.bind("<Configure>", on_configure)
+
+    scroll_frame.bind(
+        "<Configure>",
+        lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+    )
+
+    canvas.configure(yscrollcommand=scrollbar.set)
+
+    canvas.pack(side="left", fill="both", expand=True)
+    scrollbar.pack(side="right", fill="y")
+
+    return scroll_frame
+
 # ======================================================
 # ORDER PAGE (FINAL FIXED VERSION)
 # ======================================================
@@ -258,14 +322,22 @@ def order():
     cart = []
 
     # LEFT = menu, RIGHT = cart
-    menu_frame = Frame(win, bg="#F2DFD7")
-    menu_frame.pack(side="left", fill="both", expand=True)
+    menu_container = Frame(win, bg="#F2DFD7")
+    menu_container.pack(side="left", fill="both", expand=True, padx=12, pady=12)
 
-    cart_frame = Frame(win, bg="white", width=300)
-    cart_frame.pack(side="right", fill="y")
+    menu_frame = create_scrollable_frame(menu_container, "#F2DFD7")
+
+    cart_frame = ttk.Frame(win, style="Card.TFrame", width=320)
+    cart_frame.pack(side="right", fill="y", padx=12, pady=12)
     cart_frame.pack_propagate(False)
 
-    Label(cart_frame, text="Keranjang", font=("Arial", 16), bg="white").pack(pady=10)
+    Label(
+    cart_frame,
+    text="🛒 Keranjang",
+    font=("Arial", 16, "bold"),
+    bg="white"
+    ).pack(pady=10)
+
 
     # DISKON
     Label(cart_frame, text="Kode Diskon:", bg="white").pack()
@@ -369,8 +441,14 @@ def order():
 
                 Button(ctrl, text="+", width=3, command=plus).pack(side="left", padx=2)
                 Button(ctrl, text="-", width=3, command=minus).pack(side="left", padx=2)
-                Button(ctrl, text="Hapus", command=remove).pack(side="left", padx=4)
-
+                Button(
+                    ctrl,
+                    text="Hapus",
+                    bg="#C0392B",
+                    fg="white",
+                    relief="flat",
+                    command=remove
+                )
                 total += c['harga'] * c['jumlah']
 
         kode = diskon_entry.get().upper().strip()
@@ -393,29 +471,30 @@ def order():
         for w in menu_frame.winfo_children():
             w.destroy()
 
-        Button(menu_frame, text="Refresh Menu", command=build_menu).pack(pady=6)
-
         items = load_menu_data()
-        for item in items:
-            frame = Frame(menu_frame, bg="#F2DFD7")
-            frame.pack(fill="x", pady=6)
 
-            # image
+        for item in items:
+            frame = ttk.Frame(menu_frame, style="Card.TFrame")
+            frame.pack(fill="x", pady=10, padx=12)
+        
+            # IMAGE
             try:
                 img = Image.open(item['foto']).resize((140, 110))
                 img = ImageTk.PhotoImage(img)
-                lbl = Label(frame, image=img, bg="#F2DFD7")
+                lbl = Label(frame, image=img, bg="white")
                 lbl.image = img
-                lbl.pack(side="left", padx=6)
             except:
-                Label(frame, text="(No Image)", width=15, height=6, bg="#DDD").pack(side="left", padx=6)
+                lbl = Label(frame, text="(No Image)", width=15, height=6, bg="white")
 
-            info = Frame(frame, bg="#F2DFD7")
-            info.pack(side="left", padx=10)
+            lbl.pack(side="left", padx=12, pady=12)
 
-            Label(info, text=item["nama"], font=("Arial", 14), bg="#F2DFD7").pack(anchor="w")
-            Label(info, text=f"Rp {item['harga']}", bg="#F2DFD7").pack(anchor="w")
-            stock_label = Label(info, text=f"Stok: {item['stok']}", bg="#F2DFD7")
+            # INFO — WAJIB SELALU ADA
+            info = Frame(frame, bg="white")
+            info.pack(side="left", fill="both", expand=True, padx=10, pady=12)
+
+            Label(info, text=item["nama"], font=("Arial", 14, "bold"), bg="white").pack(anchor="w")
+            Label(info, text=f"Rp {item['harga']}", fg="#6F4E37", bg="white").pack(anchor="w")
+            stock_label = Label(info, text=f"Stok: {item['stok']}", bg="white")
             stock_label.pack(anchor="w")
 
             def add_item(it=item, stok_lbl=stock_label, btn=None):
@@ -453,6 +532,7 @@ def order():
                 btn.config(text="Habis", state="disabled")
             btn.pack(side="right", padx=10)
 
+
     build_menu()
     refresh_cart()
 
@@ -484,8 +564,40 @@ def order():
 
         messagebox.showinfo("Sukses", "Pesanan Berhasil Dibuat!")
 
-    Button(cart_frame, text="Buat Pesanan", font=("Arial", 12, "bold"), command=checkout)\
-        .pack(pady=18)
+    Button(
+        cart_frame,
+        text="Buat Pesanan",
+        font=("Arial", 12, "bold"),
+        bg="#4CAF50",
+        fg="white",
+        activebackground="#43A047",
+        relief="flat",
+        command=checkout
+        ).pack(fill="x", padx=12, pady=16)
+
+
+
+def show_qr_window(order_id, total):
+    qr_data = f"QRIS|{order_id}|TOTAL={total}"
+
+    img = qrcode.make(qr_data)
+
+    win = Toplevel()
+    win.title("QRIS Payment")
+    win.geometry("320x360")
+    win.configure(bg="white")
+
+    Label(win, text="Scan QR untuk Membayar", font=("Arial", 12, "bold"), bg="white").pack(pady=10)
+
+    qr_img = ImageTk.PhotoImage(img)
+    lbl = Label(win, image=qr_img, bg="white")
+    lbl.image = qr_img
+    lbl.pack(pady=10)
+
+    Label(win, text=f"Order ID: {order_id}", bg="white").pack()
+    Label(win, text=f"Total: Rp {total}", bg="white").pack(pady=(0,10))
+
+    Button(win, text="Tutup", command=win.destroy).pack()
 
 
 
@@ -510,8 +622,11 @@ def kasir():
     Button(laporan_frame, text="Refresh Laporan", command=lambda: total_label.config(text=f"Total Penjualan Hari Ini (Lunas): Rp {total_pendapatan_hari_ini()}")).pack()
 
     Label(win, text="Pesanan Masuk", font=("Arial", 16), bg="#F2DFD7").pack(pady=10)
-    list_frame = Frame(win, bg="#F2DFD7")
-    list_frame.pack(fill="both", expand=True, padx=8, pady=6)
+    list_container = Frame(win, bg="#F2DFD7")
+    list_container.pack(fill="both", expand=True, padx=8, pady=6)
+
+    list_frame = create_scrollable_frame(list_container, "#F2DFD7")
+
 
     def show_detail_and_pay(tid, d):
         w = Toplevel(win)
@@ -543,14 +658,25 @@ def kasir():
         # metode pembayaran
         metode_var = StringVar(value=d.get("metode_pembayaran", "Cash"))
         Label(w, text="Pilih Metode Pembayaran:", bg="white").pack(anchor="w", padx=12, pady=(10,0))
-        metode_box = ttk.Combobox(w, textvariable=metode_var, values=["Cash","QR","EDC"], state="readonly")
+        metode_box = ttk.Combobox(
+        w,
+        textvariable=metode_var,
+        values=["Cash","QR","EDC"],
+        state="readonly"
+        )
         metode_box.pack(anchor="w", padx=12)
 
         def proses():
-            set_transaksi_lunas(tid, metode_var.get())
+            metode = metode_var.get()
+
+            if metode == "QR":
+                show_qr_window(tid, d["total"])
+
+            set_transaksi_lunas(tid, metode)
             total_label.config(text=f"Total Penjualan Hari Ini (Lunas): Rp {total_pendapatan_hari_ini()}")
             refresh()
             w.destroy()
+
 
         Button(w, text="Proses Pembayaran (Tandai Lunas)", bg="#4CAF50", fg="white", command=proses).pack(pady=12)
 
@@ -647,8 +773,11 @@ def waiter():
     refresh_btn = Button(control_frame, text="Refresh", command=lambda: refresh())
     refresh_btn.pack(side="right")
 
-    list_frame = Frame(win, bg="#F2DFD7")
-    list_frame.pack(fill="both", expand=True, padx=12, pady=8)
+    list_container = Frame(win, bg="#F2DFD7")
+    list_container.pack(fill="both", expand=True, padx=12, pady=8)
+
+    list_frame = create_scrollable_frame(list_container, "#F2DFD7")
+
 
     def show_detail_window(order_id, meja_id, total):
         w = Toplevel(win)
@@ -741,8 +870,11 @@ def admin():
     Label(win, text="Kelola Menu", font=("Arial", 20, "bold"), bg="#F2DFD7").pack(pady=10)
 
     # FRAME LIST MENU
-    list_frame = Frame(win, bg="#F2DFD7")
-    list_frame.pack(fill="both", expand=True, pady=10)
+    list_container = Frame(win, bg="#F2DFD7")
+    list_container.pack(fill="both", expand=True, pady=10)
+
+    list_frame = create_scrollable_frame(list_container, "#F2DFD7")
+
 
     # FRAME FORM TAMBAH MENU
     form_frame = Frame(win, bg="#E8DCC8", bd=2, relief="ridge")
@@ -964,27 +1096,88 @@ def attempt():
         pemilik()
 
 # ======================================================
-# LOGIN WINDOW UI
+# LOGIN WINDOW UI — MODERN SPLIT CARD
 # ======================================================
 
-center_frame = Frame(login_window, bg="#F2DFD7")
-center_frame.place(relx=0.5, rely=0.5, anchor="center")
+# background tetap
+login_window.configure(bg="#F2DFD7")
 
-Label(center_frame, text="Python Cafe", font=("Ink Free", 32, "bold"), bg="#F2DFD7").pack(pady=(0, 30))
+# container tengah
+container = Frame(login_window, bg="#F2DFD7")
+container.pack(fill="both", expand=True)
 
-Label(center_frame, text="Username:", font=("Arial", 12), bg="#F2DFD7").pack(anchor="w")
-u_entry = Entry(center_frame, font=("Arial", 14), width=30)
-u_entry.pack(pady=(0, 10), ipady=4)
+# CARD UTAMA
+card = Frame(container, bg="white", width=760, height=420)
+card.place(relx=0.5, rely=0.5, anchor="center")
+card.pack_propagate(False)
 
-Label(center_frame, text="Password:", font=("Arial", 12), bg="#F2DFD7").pack(anchor="w")
-p_entry = Entry(center_frame, show="*", font=("Arial", 14), width=30)
-p_entry.pack(pady=(0, 20), ipady=4)
+# ================= LEFT PANEL =================
+left = Frame(card, bg="#6F4E37", width=420)
+left.pack(side="left", fill="both")
+left.pack_propagate(False)
 
-loginbutton = Button(center_frame, text="Login", font=("Arial", 14, "bold"), command=attempt, width=15)
-loginbutton.pack(pady=10, ipady=5)
+Label(
+    left,
+    text="Welcome to\nPython Cafe",
+    font=("Arial", 22, "bold"),
+    fg="white",
+    bg="#6F4E37",
+    justify="left"
+).pack(anchor="w", padx=30, pady=(90, 15))
 
-login_status_label = Label(center_frame, text="", font=("Arial", 10), bg="#F2DFD7")
-login_status_label.pack()
+Label(
+    left,
+    text=(
+        "A simple Point of Sale system\n\n"
+        "• Order Management\n"
+        "• Cashier Workflow\n"
+        "• Waiter Service\n"
+        "• Sales Report"
+    ),
+    font=("Arial", 12),
+    fg="#E8DCC8",
+    bg="#6F4E37",
+    justify="left"
+).pack(anchor="w", padx=30)
+
+# ================= RIGHT PANEL =================
+right = Frame(card, bg="white")
+right.pack(side="right", fill="both", expand=True)
+
+form = Frame(right, bg="white")
+form.place(relx=0.5, rely=0.5, anchor="center")
+
+Label(
+    form,
+    text="USER LOGIN",
+    font=("Arial", 16, "bold"),
+    bg="white"
+).pack(pady=(0, 20))
+
+Label(form, text="Username", bg="white").pack(anchor="w")
+u_entry = Entry(form, font=("Arial", 13), width=28)
+u_entry.pack(ipady=6, pady=(0, 12))
+
+Label(form, text="Password", bg="white").pack(anchor="w")
+p_entry = Entry(form, show="*", font=("Arial", 13), width=28)
+p_entry.pack(ipady=6)
+
+login_status_label = Label(form, text="", fg="red", bg="white", font=("Arial", 10))
+login_status_label.pack(anchor="w", pady=(8, 0))
+
+loginbutton = Button(
+    form,
+    text="LOGIN",
+    font=("Arial", 12, "bold"),
+    bg="#4CAF50",
+    fg="white",
+    activebackground="#43A047",
+    relief="flat",
+    command=attempt
+)
+loginbutton.pack(fill="x", pady=20, ipady=8)
+
+apply_theme(login_window)
 
 login_window.mainloop()
 
